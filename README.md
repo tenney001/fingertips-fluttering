@@ -2,6 +2,12 @@
 
 一个基于Vue 3的现代化打字练习应用，最初为8岁儿童设计，但同样适用于所有希望提升打字技能的用户（儿童、青少年、成人）。
 
+## 🎮 在线试玩
+
+**GitHub Pages** - [https://tenney001.github.io/fingertips-fluttering/](https://tenney001.github.io/fingertips-fluttering/)
+
+无需安装，打开即用！
+
 ## 🌟 核心特性
 
 ### ✅ V1.0 已实现功能
