@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   test: {
     globals: true,
-    environment: 'jsdom'
+    environment: 'node'
   },
   resolve: {
     alias: {

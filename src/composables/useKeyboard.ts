@@ -14,6 +14,23 @@ export function useKeyboard() {
   const isListening = ref(false);
   const lastKeyTime = ref(0);
 
+  // ========== 音效性能优化 - 方案一 ==========
+  // 1. 复用 AudioContext（只创建一次）
+  let audioContext: AudioContext | null = null;
+  const getAudioContext = () => {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    return audioContext;
+  };
+
+  // 2. 音效节流（50ms）
+  const SOUND_THROTTLE = 50; // 最小间隔50ms
+  let lastSoundTime = 0;
+
+  // 3. 活跃音频节点跟踪（避免内存泄漏）
+  const activeOscillators: OscillatorNode[] = [];
+
   /**
    * 处理按键事件
    */
@@ -88,29 +105,46 @@ export function useKeyboard() {
 
   /**
    * 播放正确音效 - 使用Web Audio API生成
+   * 优化：复用AudioContext + 节流机制
    */
   function playCorrectSound() {
     if (!configStore.soundEnabled) return;
 
+    // 音效节流 - 防止频繁触发
+    const now = Date.now();
+    if (now - lastSoundTime < SOUND_THROTTLE) {
+      return; // 跳过此次音效
+    }
+    lastSoundTime = now;
+
     try {
-      // 使用Web Audio API生成音效
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
+      const ctx = getAudioContext();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
 
       oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+      gainNode.connect(ctx.destination);
 
       // 正确音效 - 清脆的上扬音调
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+      const duration = 0.08; // 缩短持续时间减少资源占用
+      oscillator.frequency.setValueAtTime(800, ctx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + duration);
 
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
 
       oscillator.type = 'sine';
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.1);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + duration);
+
+      // 跟踪活跃节点，释放资源
+      activeOscillators.push(oscillator);
+      oscillator.addEventListener('ended', () => {
+        const index = activeOscillators.indexOf(oscillator);
+        if (index > -1) {
+          activeOscillators.splice(index, 1);
+        }
+      });
     } catch (e) {
       // 静默处理
       console.log('Audio not supported');
@@ -119,29 +153,46 @@ export function useKeyboard() {
 
   /**
    * 播放错误音效 - 使用Web Audio API生成
+   * 优化：复用AudioContext + 节流机制
    */
   function playWrongSound() {
     if (!configStore.soundEnabled) return;
 
+    // 音效节流 - 防止频繁触发
+    const now = Date.now();
+    if (now - lastSoundTime < SOUND_THROTTLE) {
+      return; // 跳过此次音效
+    }
+    lastSoundTime = now;
+
     try {
-      // 使用Web Audio API生成音效
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
+      const ctx = getAudioContext();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
 
       oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+      gainNode.connect(ctx.destination);
 
       // 错误音效 - 低沉的下落音调
-      oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.2);
+      const duration = 0.15; // 缩短持续时间减少资源占用
+      oscillator.frequency.setValueAtTime(400, ctx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + duration);
 
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
 
       oscillator.type = 'square';
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.2);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + duration);
+
+      // 跟踪活跃节点，释放资源
+      activeOscillators.push(oscillator);
+      oscillator.addEventListener('ended', () => {
+        const index = activeOscillators.indexOf(oscillator);
+        if (index > -1) {
+          activeOscillators.splice(index, 1);
+        }
+      });
     } catch (e) {
       // 静默处理
       console.log('Audio not supported');
@@ -168,6 +219,12 @@ export function useKeyboard() {
 
   onUnmounted(() => {
     stopListening();
+    // 清理音频资源
+    if (audioContext) {
+      audioContext.close();
+      audioContext = null;
+    }
+    activeOscillators.length = 0;
   });
 
   return {

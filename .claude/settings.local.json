@@ -22,7 +22,12 @@
       "Bash(npm test -- tests/e2e/game.test.ts --testTimeout=45000 --run)",
       "Bash(npx vite build --mode development)",
       "Bash(npx sass --version)",
-      "Bash(npx sass --check src/components/TextImportModal.vue)"
+      "Bash(npx sass --check src/components/TextImportModal.vue)",
+      "Bash(npm test -- tests/performance/audio-performance.test.ts --testTimeout=120000 --run)",
+      "Bash(npm test -- tests/performance/audio-performance.test.ts)",
+      "Bash(npm test -- tests/performance/simple.test.ts)",
+      "Bash(npm test -- tests/performance/audio-performance.test.ts --run)",
+      "Bash(npm run test:e2e -- tests/performance/audio-performance.test.ts --testTimeout=90000)"
     ],
     "deny": [],
     "ask": []
