@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 
 export default defineConfig({
+  base: './',  // 使用相对路径，可部署到任意三级目录结构
   plugins: [vue()],
   server: {
     port: 3000,
@@ -24,9 +25,5 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src')
     }
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom'
   }
 });
