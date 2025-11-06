@@ -240,6 +240,8 @@ gameStore.initializeGame();
   flex-direction: column;
   align-items: center;
   gap: 15px;
+  height: 80px; // 固定高度，防止布局抖动
+  justify-content: center; // 内容居中
 }
 
 // 准备倒计时样式
