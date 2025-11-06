@@ -80,7 +80,7 @@ const confettiEmojis = ['🎉', '✨', '🎊', '🌟', '💫', '⭐', '🎈', '�
 /**
  * 获取撒花特效样式
  */
-function getConfettiStyle(index: number) {
+function getConfettiStyle(_index: number) {
   const delay = Math.random() * 2;
   const duration = 3 + Math.random() * 2;
   const left = Math.random() * 100;

@@ -27,7 +27,8 @@
       "Bash(npm test -- tests/performance/audio-performance.test.ts)",
       "Bash(npm test -- tests/performance/simple.test.ts)",
       "Bash(npm test -- tests/performance/audio-performance.test.ts --run)",
-      "Bash(npm run test:e2e -- tests/performance/audio-performance.test.ts --testTimeout=90000)"
+      "Bash(npm run test:e2e -- tests/performance/audio-performance.test.ts --testTimeout=90000)",
+      "Bash(npm install -D vue-tsc@latest)"
     ],
     "deny": [],
     "ask": []

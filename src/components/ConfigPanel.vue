@@ -60,7 +60,6 @@
         <input
           type="checkbox"
           v-model="configStore.soundEnabled"
-          @change="configStore.updateSoundEnabled"
         />
         启用音效
       </label>

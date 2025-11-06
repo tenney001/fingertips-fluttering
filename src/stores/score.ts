@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { ScoreState } from '@/types';
 import { GAME_CONFIG } from '@/utils/config';
 
 /**

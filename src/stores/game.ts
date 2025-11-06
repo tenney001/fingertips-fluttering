@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import type { GameState, GameStatus } from '@/types';
+import type { GameStatus } from '@/types';
 import { generateSequence, generateFromText, generateMixedSequence } from '@/utils/sequenceGenerator';
 import { GAME_CONFIG } from '@/utils/config';
 
