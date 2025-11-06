@@ -16,30 +16,7 @@
     <!-- 设置弹窗 -->
     <div v-if="showSettings" class="settings-modal" @click.self="showSettings = false">
       <div class="settings-content">
-        <h3>游戏设置</h3>
-        <div class="setting-item">
-          <label>
-            <input
-              type="checkbox"
-              v-model="configStore.caseSensitive"
-              @change="onCaseSensitiveChange"
-            />
-            区分大小写
-          </label>
-          <span class="hint">
-            {{ configStore.caseSensitive ? '区分大小写 (A ≠ a)' : '忽略大小写 (A = a)' }}
-          </span>
-        </div>
-        <div class="setting-item">
-          <label>
-            <input
-              type="checkbox"
-              v-model="configStore.soundEnabled"
-              @change="configStore.updateSoundEnabled"
-            />
-            启用音效
-          </label>
-        </div>
+        <ConfigPanel />
         <button class="btn-close" @click="showSettings = false">关闭</button>
       </div>
     </div>
@@ -79,30 +56,21 @@
 import { ref } from 'vue';
 import { useGameStore } from '@/stores/game';
 import { useScoreStore } from '@/stores/score';
-import { useConfigStore } from '@/stores/config';
 import { useKeyboard } from '@/composables/useKeyboard';
 import ScoreBoard from './ScoreBoard.vue';
 import VirtualKeyboard from './VirtualKeyboard.vue';
 import SequenceView from './SequenceView.vue';
 import ResultModal from './ResultModal.vue';
+import ConfigPanel from './ConfigPanel.vue';
 
 const gameStore = useGameStore();
 const scoreStore = useScoreStore();
-const configStore = useConfigStore();
 
 // 启用键盘监听
 useKeyboard();
 
 // 设置弹窗状态
 const showSettings = ref(false);
-
-/**
- * 处理大小写配置变化
- */
-function onCaseSensitiveChange() {
-  configStore.updateCaseSensitive(configStore.caseSensitive);
-  gameStore.updateCaseSensitivity(configStore.caseSensitive);
-}
 
 // 初始化游戏
 gameStore.initializeGame();

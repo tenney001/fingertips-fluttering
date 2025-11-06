@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { GameState, GameStatus } from '@/types';
-import { generateSequence } from '@/utils/sequenceGenerator';
+import { generateSequence, generateFromText, generateMixedSequence } from '@/utils/sequenceGenerator';
 import { GAME_CONFIG } from '@/utils/config';
 
 /**
@@ -17,6 +17,9 @@ export const useGameStore = defineStore('game', () => {
   const caseSensitive = ref(GAME_CONFIG.caseSensitive);
   const timerId = ref<number | null>(null);
   const preparationTime = ref(3); // 3秒准备倒计时
+  const useImportedText = ref(GAME_CONFIG.useImportedText); // V1.1新增：是否使用导入文本
+  const importedText = ref(GAME_CONFIG.importedText); // V1.1新增：导入的文本内容
+  const mixedMode = ref(GAME_CONFIG.mixedMode); // V1.1新增：混合模式
 
   // Getters - 当前字母始终是序列第一个元素
   const currentChar = computed(() => sequence.value[0] || '');
@@ -30,12 +33,36 @@ export const useGameStore = defineStore('game', () => {
   const canStart = computed(() => status.value === 'idle' || status.value === 'finished');
   const isPreparing = computed(() => status.value === 'preparing');
 
+  /**
+   * 根据当前模式生成序列
+   */
+  function generateCurrentSequence(): string[] {
+    if (useImportedText.value && importedText.value) {
+      if (mixedMode.value) {
+        // 混合模式
+        return generateMixedSequence(importedText.value, GAME_CONFIG.sequenceLength, caseSensitive.value);
+      } else {
+        // 纯文本模式
+        const textSeq = generateFromText(importedText.value, caseSensitive.value);
+        // 如果文本不足200字符，补充随机字母
+        if (textSeq.length < GAME_CONFIG.sequenceLength) {
+          const remaining = GAME_CONFIG.sequenceLength - textSeq.length;
+          const randomSeq = generateSequence(remaining, caseSensitive.value);
+          return [...textSeq, ...randomSeq];
+        }
+        return textSeq;
+      }
+    }
+    // 默认随机模式
+    return generateSequence(GAME_CONFIG.sequenceLength, caseSensitive.value);
+  }
+
   // Actions
   /**
    * 初始化游戏
    */
   function initializeGame() {
-    sequence.value = generateSequence(GAME_CONFIG.sequenceLength, caseSensitive.value);
+    sequence.value = generateCurrentSequence();
     timeRemaining.value = GAME_CONFIG.duration;
     status.value = 'idle';
   }
@@ -49,7 +76,7 @@ export const useGameStore = defineStore('game', () => {
     // 设置准备状态
     status.value = 'preparing';
     preparationTime.value = 3;
-    sequence.value = generateSequence(GAME_CONFIG.sequenceLength, caseSensitive.value);
+    sequence.value = generateCurrentSequence();
     timeRemaining.value = GAME_CONFIG.duration;
 
     // 3秒倒计时准备阶段
@@ -149,7 +176,35 @@ export const useGameStore = defineStore('game', () => {
     caseSensitive.value = enabled;
     // 如果游戏未开始，重新生成序列
     if (status.value === 'idle' || status.value === 'finished') {
-      sequence.value = generateSequence(GAME_CONFIG.sequenceLength, enabled);
+      sequence.value = generateCurrentSequence();
+    }
+  }
+
+  /**
+   * 导入文本内容（V1.1新增）
+   * @param text 文本内容
+   * @param mode 模式：'text-only' 或 'mixed'
+   */
+  function importTextContent(text: string, mode: 'text-only' | 'mixed') {
+    importedText.value = text;
+    useImportedText.value = true;
+    mixedMode.value = mode === 'mixed';
+    // 如果游戏未开始，重新生成序列
+    if (status.value === 'idle' || status.value === 'finished') {
+      sequence.value = generateCurrentSequence();
+    }
+  }
+
+  /**
+   * 清除导入文本，恢复随机模式（V1.1新增）
+   */
+  function clearImportedText() {
+    importedText.value = '';
+    useImportedText.value = false;
+    mixedMode.value = false;
+    // 如果游戏未开始，重新生成序列
+    if (status.value === 'idle' || status.value === 'finished') {
+      sequence.value = generateCurrentSequence();
     }
   }
 
@@ -160,6 +215,9 @@ export const useGameStore = defineStore('game', () => {
     timeRemaining,
     caseSensitive,
     preparationTime,
+    useImportedText,
+    importedText,
+    mixedMode,
     // Getters
     currentChar,
     progress,
@@ -174,6 +232,8 @@ export const useGameStore = defineStore('game', () => {
     endGame,
     restartGame,
     advanceSequence,
-    updateCaseSensitivity
+    updateCaseSensitivity,
+    importTextContent,
+    clearImportedText
   };
 });

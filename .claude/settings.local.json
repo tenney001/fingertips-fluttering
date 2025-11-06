@@ -19,7 +19,10 @@
       "Bash(npm install --save-dev ts-node)",
       "Bash(npm test -- tests/e2e/game.test.ts)",
       "Bash(npm test -- tests/e2e/game.test.ts --testTimeout=45000)",
-      "Bash(npm test -- tests/e2e/game.test.ts --testTimeout=45000 --run)"
+      "Bash(npm test -- tests/e2e/game.test.ts --testTimeout=45000 --run)",
+      "Bash(npx vite build --mode development)",
+      "Bash(npx sass --version)",
+      "Bash(npx sass --check src/components/TextImportModal.vue)"
     ],
     "deny": [],
     "ask": []

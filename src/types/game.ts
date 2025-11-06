@@ -14,6 +14,9 @@ export interface GameState {
   startTime: number | null;
   endTime: number | null;
   caseSensitive: boolean;  // V1.0新增：大小写配置
+  useImportedText: boolean;  // V1.1新增：是否使用导入文本
+  importedText: string;  // V1.1新增：导入的文本内容
+  mixedMode: boolean;  // V1.1新增：混合模式（文本+随机）
 }
 
 /**
@@ -55,4 +58,7 @@ export interface GameConfig {
   sequenceLength: number;
   caseSensitive: boolean;
   soundEnabled: boolean;
+  useImportedText: boolean;  // V1.1新增：是否使用导入文本
+  importedText: string;  // V1.1新增：导入的文本内容
+  mixedMode: boolean;  // V1.1新增：混合模式（文本+随机）
 }
