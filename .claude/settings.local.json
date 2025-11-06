@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create vite@latest . -- --template vue-ts)",
+      "Bash(npm install)",
+      "Bash(npm run type-check)",
+      "Bash(npm run test:run)",
+      "Bash(npm install -D sass)",
+      "Bash(npm install --save-dev sass)",
+      "Bash(rm tests/setup.ts)",
+      "Bash(npm run dev)",
+      "Bash(npm run build)",
+      "Bash(npx vite build)",
+      "Bash(d:studyclaude-code-projectfingertips-flutteringcodeSOUND_FILES_NEEDED.txt)",
+      "Bash(npm install --save-dev puppeteer)",
+      "Bash(npm install --save-dev jest @types/jest ts-jest puppeteer)",
+      "Bash(chmod +x run-e2e-tests.sh)",
+      "Bash(npm run test:e2e)",
+      "Bash(npm install --save-dev ts-node)",
+      "Bash(npm test -- tests/e2e/game.test.ts)",
+      "Bash(npm test -- tests/e2e/game.test.ts --testTimeout=45000)",
+      "Bash(npm test -- tests/e2e/game.test.ts --testTimeout=45000 --run)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
